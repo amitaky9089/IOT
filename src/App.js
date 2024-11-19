@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import Login from "./components/login";
 import GraphTooltip from "./components/Graphtool";
 import "./App.css";
 
 function App() {
+  const [loggedInUser, setLoggedInUser] = useState(null); // Track logged-in user
   const [rangeValues, setRangeValues] = useState({
     Device1: { low: "", high: "", temperature: "" },
     Device2: { low: "", high: "", temperature: "" },
@@ -18,42 +20,21 @@ function App() {
   });
 
   const fetchDeviceInfo = async (device) => {
-    const dummyData = {
-      Device1: {
-        lastUpdated: "2024-11-16 14:30:00",
-        isActive: true,
-        graphData: {
-          time: ["14:00", "14:30", "15:00", "15:30", "16:00"],
-          temperature: [22, 25, 23, 27, 26],
-        },
-      },
-      Device2: {
-        lastUpdated: "2024-11-16 15:00:00",
-        isActive: false,
-        graphData: {
-          time: ["14:00", "14:30", "15:00", "15:30", "16:00"],
-          temperature: [20, 21, 19, 22, 24],
-        },
-      },
-      Device3: {
-        lastUpdated: "2024-11-16 16:15:00",
-        isActive: true,
-        graphData: {
-          time: ["14:00", "14:30", "15:00", "15:30", "16:00"],
-          temperature: [23, 24, 22, 21, 25],
-        },
-      },
-    };
+    try {
+      const response = await fetch("http://127.0.0.1:5000/api/devices");
+      if (!response.ok) throw new Error("Failed to fetch device data.");
+      const data = await response.json();
 
-    await new Promise((resolve) => setTimeout(resolve, 500)); // Simulated delay
-
-    setHoverInfo({
-      device,
-      lastUpdated: dummyData[device].lastUpdated,
-      isActive: dummyData[device].isActive,
-      visible: true,
-      graphData: dummyData[device].graphData,
-    });
+      setHoverInfo({
+        device,
+        lastUpdated: data[device].lastUpdated,
+        isActive: data[device].isActive,
+        visible: true,
+        graphData: data[device].graphData,
+      });
+    } catch (error) {
+      console.error("Error fetching device data:", error);
+    }
   };
 
   const handleMouseEnter = (device) => {
@@ -61,7 +42,13 @@ function App() {
   };
 
   const handleMouseLeave = () => {
-    setHoverInfo({ device: null, lastUpdated: "", isActive: null, visible: false, graphData: null });
+    setHoverInfo({
+      device: null,
+      lastUpdated: "",
+      isActive: null,
+      visible: false,
+      graphData: null,
+    });
   };
 
   const handleRangeChange = (device, field, value) => {
@@ -82,9 +69,26 @@ function App() {
     }
   };
 
+  // Handle successful login
+  const handleLoginSuccess = (username) => {
+    setLoggedInUser(username);
+  };
+
+  // Logout handler (optional)
+  const handleLogout = () => {
+    setLoggedInUser(null);
+  };
+
+  if (!loggedInUser) {
+    return <Login onLoginSuccess={handleLoginSuccess} />;
+  }
+
   return (
     <div className="app-container">
       <h1>IoT-Based Temperature Control for Industrial Application</h1>
+      {/* <button className="logout-button" onClick={handleLogout}>
+        Logout
+      </button> */}
       <div className="content">
         {["Device1", "Device2", "Device3"].map((device) => (
           <div
@@ -135,8 +139,12 @@ function App() {
               />
             )}
           </div>
+          
         ))}
       </div>
+      <button className="logout-button" onClick={handleLogout}>
+        Logout
+      </button>
     </div>
   );
 }
