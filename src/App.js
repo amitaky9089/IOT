@@ -86,9 +86,9 @@ function App() {
   return (
     <div className="app-container">
       <h1>IoT-Based Temperature Control for Industrial Application</h1>
-      <button className="logout-button" onClick={handleLogout}>
+      {/* <button className="logout-button" onClick={handleLogout}>
         Logout
-      </button>
+      </button> */}
       <div className="content">
         {["Device1", "Device2", "Device3"].map((device) => (
           <div
@@ -139,8 +139,12 @@ function App() {
               />
             )}
           </div>
+          
         ))}
       </div>
+      <button className="logout-button" onClick={handleLogout}>
+        Logout
+      </button>
     </div>
   );
 }

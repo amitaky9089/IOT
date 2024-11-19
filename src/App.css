@@ -100,3 +100,9 @@ h1 {
   height: 250px;
   margin-top: 10px;
 }
+
+.logout-button{
+  position: absolute;
+  bottom: 50px;
+  right: 200px;
+}
