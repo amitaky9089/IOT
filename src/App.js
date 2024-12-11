@@ -37,6 +37,32 @@ function App() {
     }
   };
 
+  const handleSubmit = async (device) => {
+    const deviceData = rangeValues[device];
+  
+    try {
+      const response = await fetch("http://127.0.0.1:5000/api/update-device", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          device,
+          low: deviceData.low,
+          high: deviceData.high,
+        }),
+      });
+  
+      if (!response.ok) throw new Error("Failed to update device data.");
+  
+      const data = await response.json();
+      alert(`Device ${device} updated successfully: ${data.message}`);
+    } catch (error) {
+      console.error("Error updating device data:", error);
+      alert("Failed to update the device. Please try again.");
+    }
+  };
+  
   const handleMouseEnter = (device) => {
     fetchDeviceInfo(device);
   };
@@ -126,7 +152,8 @@ function App() {
                     onChange={(e) => handleRangeChange(device, "high", e.target.value)}
                   />
                 </label>
-                <button>Submit</button>
+                {/* Updated Submit Button */}
+                <button onClick={() => handleSubmit(device)}>Submit</button>
               </div>
             </div>
 
